@@ -1,16 +1,24 @@
-const localSettings = require("./local-settings.json");
-
 const mqtt = require("azure-iot-device-mqtt").Mqtt;
 const deviceClient = require("azure-iot-device").Client;
 const message = require("azure-iot-device").Message;
+var Protocol = require("azure-iot-device-amqp").Amqp;
 
-const client = deviceClient.fromConnectionString(localSettings.deviceConnString, mqtt);
+/* Twin **/
+var Client = require("azure-iot-device").Client;
+var Protocol = require("azure-iot-device-amqp").Amqp;
 
-const inputThreshold = process.env.threshold || 'default';
-const inputPreset = process.env.preset || 'default';
+// Copy/paste your module connection string here.
+var connectionString = "HostName=weuoiotphub.azure-devices.net;DeviceId=MyNodeDevice;ModuleId=myFirstModule;SharedAccessKey=e8hoJ336114sJsXKwFz4CB2NHE5c0Q/mSSwQn35/JBE=";
+var deviceConnectionString = "HostName=weuoiotphub.azure-devices.net;DeviceId=MyNodeDevice;SharedAccessKey=kilUGVCm0XC79rpYnXfGEkRYLM1rbtzJOIp16PhpTag=";
 
-const preset = localSettings.presets[inputPreset];
-const threshold = localSettings.thresholds[inputThreshold];
+
+var moduleTwinClient = Client.fromConnectionString(connectionString, Protocol);
+// Twin ends
+const client = deviceClient.fromConnectionString(deviceConnectionString, mqtt);
+
+let temperature;
+let pressure;
+let humidity;
 
 const printResultFor = op => {
     return (err, res) => {
@@ -18,6 +26,10 @@ const printResultFor = op => {
         if (res) console.log(op + " status: " + res.constructor.name);
     };
 }
+
+
+// NOT NEEDED FOR NOW
+/*
 const prependZeroes = (value) => {
     return value.length === 3 
             ? "0" + value 
@@ -44,6 +56,8 @@ const getTemperature = (temp) => {
     }
     return temperature;
 }
+
+
 const format = (temp, hum, pres, message) => {    
 
     const temperature = getTemperature(temp);
@@ -58,31 +72,71 @@ const format = (temp, hum, pres, message) => {
 
     message.data = "00" + temperature + humidity + pressure;    
 }
+*/
 
 setInterval(() => {
-    const pTemp = preset.temp;
-    const pHumidity = preset.humidity;
-    const pPressure = preset.pressure;
 
-    const tTemp = threshold.temp;
-    const tHumidity = threshold.humidity;
-    const tPressure = threshold.pressure;
-
-    let msg = { data: "" };
-
-    const temperature = pTemp.min + Math.random() * (pTemp.max - pTemp.min);
-    const humidity = pHumidity.min + Math.random() * (pHumidity.max - pHumidity.min);
-    const pressure = pPressure.min + Math.random() * (pPressure.max - pPressure.min);  
+    const calcTemperature = temperature.min + Math.random() * (temperature.max - temperature.min);
+    const calcHumidity = humidity.min + Math.random() * (humidity.max - humidity.min);
+    const calcPressure = pressure.min + Math.random() * (pressure.max - pressure.min);  
     
-    format(temperature, humidity, pressure, msg);
+    let msg = { temperature: calcTemperature, humidity: calcHumidity, pressure: calcPressure };
     
     const data = JSON.stringify(msg);
     const telemetryMessage = new message(data);
 
-    telemetryMessage.properties.add("temperatureAlert", temperature > tTemp.max || temperature < tTemp.min ? "true" : "false");
-    telemetryMessage.properties.add("humidityAlert", humidity > tHumidity.max || humidity < tHumidity.min ? "true" : "false");
-    telemetryMessage.properties.add("pressureAlert", pressure > tPressure.max || pressure < tPressure.min ? "true" : "false");
-
+    telemetryMessage.properties.add("temperatureAlert", calcTemperature > temperature.maxAlert ||calcTemperature < temperature.minAlert ? "true" : "false");
+    telemetryMessage.properties.add("humidityAlert", calcHumidity > humidity.maxAlert || calcHumidity < humidity.minAlert ? "true" : "false");
+    telemetryMessage.properties.add("pressureAlert", calcPressure > pressure.maxAlert || calcPressure < pressure.minAlert ? "true" : "false");
 
     client.sendEvent(telemetryMessage, printResultFor("send"))
-}, 1000);
+}, 2500);
+
+
+
+moduleTwinClient.on("error", function(err) {
+    console.error(err.message);
+});
+// connect to the hub
+moduleTwinClient.open(function(err) {
+    if (err) {
+        console.error("error connecting to hub: " + err);
+        process.exit(1);
+    }
+    console.log("client opened");
+    // Create device Twinmessage
+    moduleTwinClient.getTwin(function(err, twin) {
+        if (err) {
+            console.error("error getting twin: " + err);
+            process.exit(1);
+        }
+        // Output the current properties
+        console.log("twin contents:");
+        console.log(twin.properties);
+        // Add a handler for desired property changes
+        twin.on("properties.desired", function(delta) {
+            console.log("new desired properties received:");
+            console.log(JSON.stringify(delta));
+            
+            temperature = delta.temperature;
+            pressure = delta.pressure;
+            humidity = delta.humidity;
+
+        });
+        // create a patch to send to the hub
+        var patch = {
+            updateTime: new Date().toString(),
+            firmwareVersion: "1.2.1",
+            weather: {
+                temperature: 72,
+                humidity: 17
+            }
+        };
+        // send the patch
+        twin.properties.reported.update(patch, function(err) {
+            if (err) throw err;
+            console.log("twin state reported");
+        });
+    });
+});
+
