@@ -1,4 +1,4 @@
-FROM arm32v7/node:8-slim
+FROM arm64v8/node:8-alpine
 
 WORKDIR /app/
 
@@ -10,8 +10,6 @@ COPY app.js ./
 
 COPY connection-strings.json ./
 
-EXPOSE 9229
-
 USER node
 
-CMD ["node", "--inspect=0.0.0.0:9229", "app.js"]
+CMD ["node", "app.js"]
