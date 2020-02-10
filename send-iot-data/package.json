@@ -4,15 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "simulate:office": "env threshold=office node index.js",
-    "simulate:home": "env threshold=home node index.js",
-    "simulate": "node index.js"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "azure-iot-device": "^1.7.1",
+    "azure-iot-device-amqp": "^1.11.2",
     "azure-iot-device-mqtt": "^1.7.1"
   }
 }
