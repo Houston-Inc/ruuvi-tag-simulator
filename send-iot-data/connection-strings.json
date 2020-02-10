@@ -1,0 +1,4 @@
+{
+  "deviceConnectionString": "HostName=weuoiotphub.azure-devices.net;DeviceId=MyNodeDevice;SharedAccessKey=kilUGVCm0XC79rpYnXfGEkRYLM1rbtzJOIp16PhpTag=",
+  "deviceTwinConnectionString": "HostName=weuoiotphub.azure-devices.net;DeviceId=MyNodeDevice;ModuleId=myFirstModule;SharedAccessKey=e8hoJ336114sJsXKwFz4CB2NHE5c0Q/mSSwQn35/JBE="
+}

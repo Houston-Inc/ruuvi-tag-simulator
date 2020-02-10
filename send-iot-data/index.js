@@ -2,18 +2,15 @@ const mqtt = require("azure-iot-device-mqtt").Mqtt;
 const deviceClient = require("azure-iot-device").Client;
 const message = require("azure-iot-device").Message;
 var Protocol = require("azure-iot-device-amqp").Amqp;
+var {deviceConnectionString, deviceTwinConnectionString} = require("./connection-strings.json");
 
 /* Twin **/
 var Client = require("azure-iot-device").Client;
 var Protocol = require("azure-iot-device-amqp").Amqp;
-
 // Copy/paste your module connection string here.
-var connectionString = "HostName=weuoiotphub.azure-devices.net;DeviceId=MyNodeDevice;ModuleId=myFirstModule;SharedAccessKey=e8hoJ336114sJsXKwFz4CB2NHE5c0Q/mSSwQn35/JBE=";
-var deviceConnectionString = "HostName=weuoiotphub.azure-devices.net;DeviceId=MyNodeDevice;SharedAccessKey=kilUGVCm0XC79rpYnXfGEkRYLM1rbtzJOIp16PhpTag=";
-
-
-var moduleTwinClient = Client.fromConnectionString(connectionString, Protocol);
+var moduleTwinClient = Client.fromConnectionString(deviceTwinConnectionString, Protocol);
 // Twin ends
+
 const client = deviceClient.fromConnectionString(deviceConnectionString, mqtt);
 
 let temperature;
