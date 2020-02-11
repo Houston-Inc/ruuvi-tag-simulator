@@ -17,6 +17,8 @@ let temperature;
 let pressure;
 let humidity;
 
+const macAddress = "12:34:56:78:9a:bc"
+
 const printResultFor = op => {
     return (err, res) => {
         if (err) console.log(op + " error: " + err.toString());
@@ -78,7 +80,7 @@ setInterval(() => {
     const calcHumidity = humidity.min + Math.random() * (humidity.max - humidity.min);
     const calcPressure = pressure.min + Math.random() * (pressure.max - pressure.min);
 
-    let msg = { temperature: calcTemperature, humidity: calcHumidity, pressure: calcPressure };
+    let msg = { address: macAddress, temperature: calcTemperature, humidity: calcHumidity, pressure: calcPressure };
 
     const data = JSON.stringify(msg);
     const telemetryMessage = new message(data);
