@@ -28,13 +28,13 @@ const printResultFor = op => {
 // NOT NEEDED FOR NOW
 /*
 const prependZeroes = (value) => {
-    return value.length === 3 
-            ? "0" + value 
-            : value.length === 2 
+    return value.length === 3
+            ? "0" + value
+            : value.length === 2
                 ? "00" + value
                 : value.length === 1
                     ? "000" + value
-                    : value;    
+                    : value;
 }
 
 const getTemperature = (temp) => {
@@ -55,7 +55,7 @@ const getTemperature = (temp) => {
 }
 
 
-const format = (temp, hum, pres, message) => {    
+const format = (temp, hum, pres, message) => {
 
     const temperature = getTemperature(temp);
 
@@ -67,18 +67,19 @@ const format = (temp, hum, pres, message) => {
     const hexedPressure = scaledPressure.toString(16);
     const pressure = prependZeroes(hexedPressure);
 
-    message.data = "00" + temperature + humidity + pressure;    
+    message.data = "00" + temperature + humidity + pressure;
 }
 */
 
 setInterval(() => {
+    if (!temperature || !humidity || !pressure) return;
 
     const calcTemperature = temperature.min + Math.random() * (temperature.max - temperature.min);
     const calcHumidity = humidity.min + Math.random() * (humidity.max - humidity.min);
-    const calcPressure = pressure.min + Math.random() * (pressure.max - pressure.min);  
-    
+    const calcPressure = pressure.min + Math.random() * (pressure.max - pressure.min);
+
     let msg = { temperature: calcTemperature, humidity: calcHumidity, pressure: calcPressure };
-    
+
     const data = JSON.stringify(msg);
     const telemetryMessage = new message(data);
 
@@ -114,7 +115,7 @@ moduleTwinClient.open(function(err) {
         twin.on("properties.desired", function(delta) {
             console.log("new desired properties received:");
             console.log(JSON.stringify(delta));
-            
+
             temperature = delta.temperature;
             pressure = delta.pressure;
             humidity = delta.humidity;
