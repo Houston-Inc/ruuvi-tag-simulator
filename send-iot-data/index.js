@@ -83,6 +83,7 @@ setInterval(() => {
     const data = JSON.stringify(msg);
     const telemetryMessage = new message(data);
 
+    telemetryMessage.properties.add('type', 'telemetry');
     telemetryMessage.properties.add("temperatureAlert", calcTemperature > temperature.maxAlert ||calcTemperature < temperature.minAlert ? "true" : "false");
     telemetryMessage.properties.add("humidityAlert", calcHumidity > humidity.maxAlert || calcHumidity < humidity.minAlert ? "true" : "false");
     telemetryMessage.properties.add("pressureAlert", calcPressure > pressure.maxAlert || calcPressure < pressure.minAlert ? "true" : "false");
