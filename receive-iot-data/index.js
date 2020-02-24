@@ -8,14 +8,18 @@ const printError = err => {
 
 const printMessage = message => {
     console.log("\n\n");
-    console.log("Telemetry received: ");
-    console.log(JSON.stringify(message.body));
-    console.log("Application properties (set by device): ");
-    console.log(JSON.stringify(message.applicationProperties));
-    console.log("System properties (set by IoT Hub): ");
-    console.log(JSON.stringify(message.annotations));
-    console.log("Sensor values: ");
-    console.log(message.body);
+    console.log(message);
+    
+    // console.log("Telemetry received: ");
+    // console.log(JSON.stringify(message.body));
+    // console.log("Application properties (set by device): ");
+    // console.log(JSON.stringify(message.applicationProperties));
+    
+    // console.log("System properties (set by IoT Hub): ");
+    // console.log(JSON.stringify(message.annotations));
+    
+    // console.log("Sensor values: ");
+    // console.log(message.body);
 };
 
 let ehClient;
