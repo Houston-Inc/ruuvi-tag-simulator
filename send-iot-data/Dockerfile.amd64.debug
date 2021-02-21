@@ -8,7 +8,7 @@ RUN npm install --production
 
 COPY app.js ./
 
-COPY local-settings.json ./
+COPY connection-strings.json ./
 
 EXPOSE 9229
 
